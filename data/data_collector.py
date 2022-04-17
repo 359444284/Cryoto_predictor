@@ -71,40 +71,6 @@ q.open()
 #                         )""")
 
 
-# async def trade(t, receipt_timestamp):
-#     print(f"Trade received at {receipt_timestamp}", str(t.symbol),
-#           str(t.side),
-#           float(t.price),
-#           float(t.amount))
-#
-#     date, time = str(datetime.datetime.fromtimestamp(t.timestamp).isoformat()).replace("-", ".").split('T')
-#     insert_data = [date,
-#         str(t.symbol),
-#         time,
-#         str(t.side),
-#         float(t.price),
-#         float(t.amount)]
-#     q.sendSync('.u.upd', np.string_('trades'), insert_data)
-#
-# async def books(book, receipt_timestamp):
-#     print('Feed: {} Pair: {} System Timestamp: {}'.format(
-#         book.exchange, book.symbol, receipt_timestamp
-#     ))
-#     ob = book.book
-#
-#     date, time = str(datetime.datetime.fromtimestamp(receipt_timestamp).isoformat()).replace("-", ".").split('T')
-#     insert_data = [date, str(book.symbol), time]
-#     volumes = [] #[bid1, ask1, bid2, ask2, .....]
-#     for i in range(DEPTH):
-#         bid_p, bid_v = ob.bid.index(i)
-#         ask_p, ask_v = ob.ask.index(i)
-#         volumes.extend([float(bid_v), float(ask_v)])
-#         insert_data.extend([float(bid_p), float(ask_p)])
-#     for i in range(0, DEPTH*2, 2):
-#         insert_data.extend([volumes[i], volumes[i+1]])
-#     q.sendSync('.u.upd', np.string_('trades'), insert_data)
-
-
 async def trade(t, receipt_timestamp):
     print(f"Trade received at {receipt_timestamp}", str(t.symbol),
         str(t.side),
