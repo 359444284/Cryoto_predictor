@@ -12,7 +12,7 @@ from qpython.qtype import QDOUBLE_LIST, QSTRING_LIST, QSYMBOL_LIST, QTIMESTAMP_L
 import datetime
 DEPTH = 10
 
-q = qconnection.QConnection(host='localhost', port=5010, pandas=True)
+q = qconnection.QConnection(host='localhost', port=5011, pandas=True)
 q.open()
 #
 # q.sendSync("""trades:([]
@@ -77,11 +77,10 @@ async def trade(t, receipt_timestamp):
         float(t.price),
         float(t.amount))
 
-    date, time = str(datetime.datetime.fromtimestamp(t.timestamp).isoformat()).replace("-", ".").split('T')
-    q.sendSync('`trades insert(`date${};`$\"{}\";`time${}; `{};`float${};`float${})'.format(
-        date,
+    tp = str(datetime.datetime.fromtimestamp(t.timestamp).isoformat()).replace("-", ".")
+    q.sendSync('`trades insert(`timestamp${};`$\"{}\"; `{};`float${};`float${})'.format(
+        tp,
         str(t.symbol),
-        time,
         str(t.side),
         float(t.price),
         float(t.amount)
@@ -93,8 +92,8 @@ async def books(book, receipt_timestamp):
     ))
     ob = book.book
 
-    date, time = str(datetime.datetime.fromtimestamp(receipt_timestamp).isoformat()).replace("-", ".").split('T')
-    qstr = f"`books insert (`date${date}; `$\"{book.symbol}\"; `time${time}"
+    tp = str(datetime.datetime.fromtimestamp(receipt_timestamp).isoformat()).replace("-", ".")
+    qstr = f"`books insert (`timestamp${tp}; `$\"{book.symbol}\""
     volumes = [] #[bid1, ask1, bid2, ask2, .....]
     if len(ob.bid) >= 10:
         for i in range(DEPTH):
