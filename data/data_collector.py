@@ -112,7 +112,12 @@ async def books(book, receipt_timestamp):
 def main():
     try:
         f = FeedHandler()
-        f.add_feed(Binance(symbols=['BTC-USDT'], channels=[TRADES, L2_BOOK], max_depth=DEPTH ,callbacks={TRADES: trade, L2_BOOK: books}))
+        f.add_feed(Binance(symbols=['BTC-USDT'], channels=[TRADES, L2_BOOK], max_depth=DEPTH
+                           ,callbacks={TRADES: trade, L2_BOOK: books}))
+        f.add_feed(Binance(symbols=['ETH-USDT'], channels=[TRADES, L2_BOOK], max_depth=DEPTH,
+                           callbacks={TRADES: trade, L2_BOOK: books}))
+        f.add_feed(Binance(symbols=['DOGE-BUSD'], channels=[TRADES, L2_BOOK], max_depth=DEPTH,
+                           callbacks={TRADES: trade, L2_BOOK: books}))
         f.run()
     except KeyboardInterrupt:
         pass
