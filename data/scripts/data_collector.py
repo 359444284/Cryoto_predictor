@@ -1,5 +1,6 @@
+import argparse
 import os
-
+import logging
 import numpy as np
 from cryptofeed import FeedHandler
 # from cryptofeed.callback import
@@ -15,60 +16,6 @@ DEPTH = 10
 q = qconnection.QConnection(host='localhost', port=5011, pandas=True)
 q.open()
 #
-# q.sendSync("""trades:([]
-#             date:`date$();
-#             time:`time$();
-#             symb:`symbol$();
-#             side: `symbol$();
-#             price: `float$();
-#             volume: `float$()
-#             )""")
-#
-# q.sendSync("""books:([]
-#             date:`date$();
-#             time:`time$();
-#             symb:`symbol$();
-#             bid1:`float$();
-#             ask1:`float$();
-#             bid2:`float$();
-#             ask2:`float$();
-#             bid3:`float$();
-#             ask3:`float$();
-#             bid4:`float$();
-#             ask4:`float$();
-#             bid5:`float$();
-#             ask5:`float$();
-#             bid6:`float$();
-#             ask6:`float$();
-#             bid7:`float$();
-#             ask7:`float$();
-#             bid8:`float$();
-#             ask8:`float$();
-#             bid9:`float$();
-#             ask9:`float$();
-#             bid10:`float$();
-#             ask10:`float$();
-#             bidVol1:`float$();
-#             askVol1:`float$();
-#             bidVol2:`float$();
-#             askVol2:`float$();
-#             bidVol3:`float$();
-#             askVol3:`float$();
-#             bidVol4:`float$();
-#             askVol4:`float$();
-#             bidVol5:`float$();
-#             askVol5:`float$();
-#             bidVol6:`float$();
-#             askVol6:`float$();
-#             bidVol7:`float$();
-#             askVol7:`float$();
-#             bidVol8:`float$();
-#             askVol8:`float$();
-#             bidVol9:`float$();
-#             askVol9:`float$();
-#             bidVol10:`float$();
-#             askVol10:`float$()
-#                         )""")
 
 
 async def trade(t, receipt_timestamp):
