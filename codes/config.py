@@ -5,13 +5,12 @@ import pandas as pd
 
 
 class Config:
-    SEED = 135125
-    # SEED = 100
+    SEED = 100
 ############################################################################################
 #   DataSet Setting
 ############################################################################################
-    # train_ratio = 0.8
-    train_ratio = 1.0
+    train_ratio = 0.8
+    # train_ratio = 1.0
     # default save path: ./checkpoints
     # choose data set from: fi2010, BTC_50, BTC_14, ETH_14, BTC_10
     name_dataset = "fi2010"
@@ -72,32 +71,33 @@ class Config:
     feature_dic['WVPS'] = [i for i in range(141, 141 + 1)]
     feature_dic['PD'] = [i for i in range(142, 142 + 18)]
 
-    feature_index = [0, 1, 2, 3, 62, 63] # use for backtesting [date, mid-price, bid1, ask1]
+    # feature_index = [0, 1, 2, 3, 62, 63] # use for backtesting [date, mid-price, bid1, ask1]
+    feature_index = [0, 1, 2, 3] # use for backtesting [date, mid-price, bid1, ask1]
 
-    # if feature_type == 'all':
-    #     for sublist in feature_dic.values():
-    #         feature_index.extend(sublist)
-    # elif feature_type == 'list':
-    #     for feature_name in feature_list:
-    #         feature_index.extend(feature_dic[feature_name])
-    # else:
-    #     if name_dataset != 'ETH_14' and name_dataset != 'BTC_14':
-    #         if subset_name == 'WFS':
-    #             feature_index.extend(
-    #                 [22, 23, 102, 140, 92, 137, 82, 138, 112, 114, 113, 63, 43, 42, 134, 139, 115, 133, 62, 24, 103, 65,
-    #                  67, 135, 29])
-    #         elif subset_name == 'DFR':
-    #             feature_index.extend(
-    #                 [137, 138, 22, 23, 140, 82, 102, 92, 42, 135, 112, 43, 134, 26, 114, 113, 139, 75, 24, 32, 71, 67,
-    #                  56, 69, 158])
-    #         elif subset_name == 'XGBoost':
-    #             feature_index.extend(
-    #                 [114, 113, 112, 42, 43, 137, 138, 62, 93, 63, 115, 22, 92, 23, 102, 103, 94, 117, 141, 83, 61, 84,
-    #                  139, 140, 116])
-    #         else:
-    #             feature_index.extend([102, 137, 138, 139, 140, 42, 43, 112, 113, 114, 22, 23, 92])
-    #     else:
-    #         feature_index.extend([102, 137, 138, 139, 140, 42, 52, 112, 113, 114, 22, 32, 92])
+    if feature_type == 'all':
+        for sublist in feature_dic.values():
+            feature_index.extend(sublist)
+    elif feature_type == 'list':
+        for feature_name in feature_list:
+            feature_index.extend(feature_dic[feature_name])
+    else:
+        if name_dataset != 'ETH_14' and name_dataset != 'BTC_14':
+            if subset_name == 'WFS':
+                feature_index.extend(
+                    [22, 23, 102, 140, 92, 137, 82, 138, 112, 114, 113, 63, 43, 42, 134, 139, 115, 133, 62, 24, 103, 65,
+                     67, 135, 29])
+            elif subset_name == 'DFR':
+                feature_index.extend(
+                    [137, 138, 22, 23, 140, 82, 102, 92, 42, 135, 112, 43, 134, 26, 114, 113, 139, 75, 24, 32, 71, 67,
+                     56, 69, 158])
+            elif subset_name == 'XGBoost':
+                feature_index.extend(
+                    [114, 113, 112, 42, 43, 137, 138, 62, 93, 63, 115, 22, 92, 23, 102, 103, 94, 117, 141, 83, 61, 84,
+                     139, 140, 116])
+            else:
+                feature_index.extend([102, 137, 138, 139, 140, 42, 43, 112, 113, 114, 22, 23, 92])
+        else:
+            feature_index.extend([102, 137, 138, 139, 140, 42, 52, 112, 113, 114, 22, 32, 92])
 
     if name_dataset == "fi2010":
         feature_dim = 40
