@@ -49,12 +49,36 @@ class Learned_Aggregation_Layer(nn.Module):
         return x_cls
 
 
+# class CausalConv1d(torch.nn.Conv1d):
+#     def __init__(self,
+#                  in_channels,
+#                  out_channels,
+#                  kernel_size,
+#                  stride=1,
+#                  dilation=1,
+#                  groups=1,
+#                  bias=True):
+#         super(CausalConv1d, self).__init__(
+#             in_channels,
+#             out_channels,
+#             kernel_size=kernel_size,
+#             stride=stride,
+#             padding=0,
+#             dilation=dilation,
+#             groups=groups,
+#             bias=bias)
+#
+#         self.__padding = (kernel_size - 1) * dilation
+#
+#     def forward(self, input):
+#         return super(CausalConv1d, self).forward(F.pad(input, (self.__padding, 0)))
+
 class Deeplob_CNN(nn.Module):
     def __init__(self):
         super(Deeplob_CNN, self).__init__()
 
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=(1, 3), stride=(1, 2)),
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=(1, 2), stride=(1, 2)),
             nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(32),
             nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
@@ -65,19 +89,19 @@ class Deeplob_CNN(nn.Module):
             nn.BatchNorm2d(32),
         )
         self.conv2 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 3), stride=(1, 2)),
-            nn.Tanh(),
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 2), stride=(1, 2)),
+            nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(32),
             nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
-            nn.Tanh(),
+            nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(32),
             nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
-            nn.Tanh(),
+            nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(32),
         )
 
         self.conv3 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 5)),
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 10)),
             nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(32),
             nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
@@ -92,7 +116,6 @@ class Deeplob_CNN(nn.Module):
     def forward(self, x):
         # h0: (number of hidden layers, batch size, hidden size)
         x = torch.unsqueeze(x, 1)
-        # print(x.size())
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -133,12 +156,11 @@ class TransformerEn(BasicModule):
         self.src_mask = None
         if self.config.use_time_feature:
             print('use_time_feature')
-            self.enc_embedding = DataEmbedding(64, self.config.tran_emb_dim, 'timeF', 's',
+            self.enc_embedding = DataEmbedding(self.config.feature_dim, self.config.tran_emb_dim, 'timeF', 's',
                                             0.1, lockback=self.config.lockback_window)
         else:
-            self.enc_embedding = DataEmbedding_wo_temp(25, self.config.tran_emb_dim, 'timeF', 's',
+            self.enc_embedding = DataEmbedding_wo_temp(self.config.feature_dim, self.config.tran_emb_dim, 'timeF', 's',
                                             0.1)
-        # self.enc_embedding = DataEmbedding_wo_temp(32, self.config.tran_emb_dim, dropout=self.config.tran_drop)
         self.encoder = Encoder(
             [
                 EncoderLayer(
@@ -153,7 +175,7 @@ class TransformerEn(BasicModule):
                     self.config.tran_fc_dim,
                     dropout=self.config.tran_drop,
                     activation='gelu',
-                    use_se=True
+                    use_se=self.config.use_channel_att
                 ) for l in range(self.config.tran_layer)
             ],
             norm_layer=torch.nn.LayerNorm(self.config.tran_emb_dim)
@@ -165,19 +187,12 @@ class TransformerEn(BasicModule):
         self.cls_norm = torch.nn.LayerNorm(self.config.tran_emb_dim)
 
         self.fc1 = nn.Sequential(
-            nn.Linear(self.config.tran_emb_dim, self.config.tran_emb_dim),
+            nn.Linear(self.config.tran_emb_dim*100, self.config.tran_emb_dim),
             nn.GELU()
         )
         self.fc2 = nn.Linear(self.config.tran_emb_dim, self.config.forecast_horizon // self.config.forecast_stride)
         self.aggre = Learned_Aggregation_Layer(dim=self.config.tran_emb_dim, num_heads=self.config.tran_num_head)
         self.drop = nn.Dropout(0.3)
-        self.drop1 = nn.Dropout(0.1)
-        # self.fea_norm = nn.LayerNorm(32)
-        # self.feature = Deeplob_CNN()
-        self.lstm = nn.LSTM(input_size=self.config.feature_dim,
-                            hidden_size=64,
-                            num_layers=1,
-                            batch_first=True)
 
     def forward(self, src, scr_mask=None):
         """
@@ -191,12 +206,6 @@ class TransformerEn(BasicModule):
 
         B, L, C = src.shape
 
-        # src = self.feature(src)
-        # src = self.fea_norm(src)
-
-        src, _ = self.lstm(src, None)
-        src = self.drop1(src)
-
         if self.src_mask is None or self.src_mask.size(0) != L:
             mask = self._generate_square_subsequent_mask(L).to(self.device)
             self.src_mask = mask
@@ -208,19 +217,9 @@ class TransformerEn(BasicModule):
         output = enc_out
 
         #  CLS header
-        cls_token = self.cls_token.expand(B, 1, -1)
-        output = torch.cat([cls_token, output], dim=1)
-        output = self.aggre(output)
-
-        # MLP header
-
-        # LSTM header
-        # h0 = torch.zeros(1, output.size(0), 32).to(self.device)
-        # c0 = torch.zeros(1, output.size(0), 32).to(self.device)
-        # output, _ = self.lstm(output, None)
-        # output = output[:, -1, :]
-        # output = self.drop(output)
-        # output = self.fc2(output)
+        # cls_token = self.cls_token.expand(B, 1, -1)
+        # output = torch.cat([cls_token, output], dim=1)
+        # output = self.aggre(output)
 
         output = torch.flatten(output, start_dim=1)
         output = self.drop(self.fc1(output))

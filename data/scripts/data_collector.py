@@ -2,14 +2,8 @@ import argparse
 import os
 import logging
 import numpy as np
-from cryptofeed import FeedHandler
-# from cryptofeed.callback import
-from cryptofeed.exchanges import Binance
-from cryptofeed.defines import TRADES, L2_BOOK, BID, ASK
-from decimal import Decimal
 
 from qpython import qconnection
-from qpython.qtype import QDOUBLE_LIST, QSTRING_LIST, QSYMBOL_LIST, QTIMESTAMP_LIST
 import datetime
 DEPTH = 10
 

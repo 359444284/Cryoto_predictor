@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@i-2.gpushare.com:52238 password" remoteFilesAllowedToDisappearOnAutoupload="false" showExcludedInSync="true">
+    <serverData>
+      <paths name="root@i-2.gpushare.com:52238 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/hy-tmp" local="$PROJECT_DIR$/codes" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@i-2.gpushare.com:52238 password (project level)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/hy-tmp" local="$PROJECT_DIR$/codes" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

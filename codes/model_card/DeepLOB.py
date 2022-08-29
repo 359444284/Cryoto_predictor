@@ -46,32 +46,38 @@ class Learned_Aggregation_Layer(nn.Module):
 
 # 0.7580
 class DeepLOB(BasicModule):
-    def __init__(self):
+    def __init__(self, cnn_dim=32, incep_dim=64, lstm_dim=64):
         super().__init__()
         # convolution blocks
         self.model_name = 'deeplob'
+
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=(1, 3), stride=(1, 2)),
+            nn.Conv2d(in_channels=1, out_channels=cnn_dim, kernel_size=(1, 2), stride=(1, 2)),
             nn.LeakyReLU(negative_slope=0.01),
-            #             nn.Tanh(),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
+            # nn.Tanh(),
+            nn.BatchNorm2d(cnn_dim),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(4, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
+            # nn.Tanh(),
+            nn.BatchNorm2d(cnn_dim),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(4, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(32),
+            # nn.Tanh(),
+            nn.BatchNorm2d(cnn_dim),
         )
         self.conv2 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 3), stride=(1, 2)),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(1, 2), stride=(1, 2)),
+            # nn.LeakyReLU(negative_slope=0.01),
             nn.Tanh(),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
+            nn.BatchNorm2d(cnn_dim),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(4, 1), padding='same'),
+            # nn.LeakyReLU(negative_slope=0.01),
             nn.Tanh(),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
+            nn.BatchNorm2d(cnn_dim),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(4, 1), padding='same'),
+            # nn.LeakyReLU(negative_slope=0.01),
             nn.Tanh(),
-            nn.BatchNorm2d(32),
+            nn.BatchNorm2d(cnn_dim)
         )
         # self.conv3 = nn.Sequential(
         #     Learned_Aggregation_Layer(32),
@@ -82,51 +88,47 @@ class DeepLOB(BasicModule):
         #     nn.LeakyReLU(negative_slope=0.01),
         #     nn.BatchNorm2d(32),
         # )
+        # last_dim = self.config.feature_dim -
         self.conv3 = nn.Sequential(
-                nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 5)),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(1, self.config.feature_dim//4)),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
+            nn.BatchNorm2d(cnn_dim),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(4, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),
+            nn.BatchNorm2d(cnn_dim),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(4, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(32),
+            nn.BatchNorm2d(cnn_dim),
         )
 
         # inception moduels
         self.inp1 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 1), padding='same'),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=incep_dim, kernel_size=(1, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(3, 1), padding='same'),
+            nn.BatchNorm2d(incep_dim),
+            nn.Conv2d(in_channels=incep_dim, out_channels=incep_dim, kernel_size=(3, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(64),
+            nn.BatchNorm2d(incep_dim),
         )
         self.inp2 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 1), padding='same'),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=incep_dim, kernel_size=(1, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=(5, 1), padding='same'),
+            nn.BatchNorm2d(incep_dim),
+            nn.Conv2d(in_channels=incep_dim, out_channels=incep_dim, kernel_size=(5, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(64),
+            nn.BatchNorm2d(incep_dim),
         )
         self.inp3 = nn.Sequential(
             nn.MaxPool2d((3, 1), stride=(1, 1), padding=(1, 0)),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 1), padding='same'),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=incep_dim, kernel_size=(1, 1), padding='same'),
             nn.LeakyReLU(negative_slope=0.01),
-            nn.BatchNorm2d(64),
+            nn.BatchNorm2d(incep_dim),
         )
         # lstm layers
-        self.lstm = nn.LSTM(input_size=192, hidden_size=64, num_layers=1, batch_first=True)
-        self.fc1 = nn.Linear(64, int(self.config.forecast_horizon / self.config.forecast_stride))
-
+        self.lstm = nn.LSTM(input_size=incep_dim*3, hidden_size=lstm_dim, num_layers=1, batch_first=True)
+        self.fc1 = nn.Linear(lstm_dim, int(self.config.forecast_horizon / self.config.forecast_stride))
     def forward(self, x):
-        # h0: (number of hidden layers, batch size, hidden size)
-        h0 = torch.zeros(1, x.size(0), 64).to(self.device)
-        c0 = torch.zeros(1, x.size(0), 64).to(self.device)
         x = torch.unsqueeze(x, 1)
-        # print(x.size())
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -134,11 +136,9 @@ class DeepLOB(BasicModule):
         x_inp2 = self.inp2(x)
         x_inp3 = self.inp3(x)
         x = torch.cat((x_inp1, x_inp2, x_inp3), dim=1)
-        # print(x.size())
-        #         x = torch.transpose(x, 1, 2)
         x = x.permute(0, 2, 1, 3)
         x = torch.reshape(x, (-1, x.shape[1], x.shape[2]))
-        x, _ = self.lstm(x, (h0, c0))
+        x, _ = self.lstm(x, None)
         x = x[:, -1, :]
         x = self.fc1(x)
 

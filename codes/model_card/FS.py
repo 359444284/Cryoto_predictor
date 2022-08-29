@@ -27,9 +27,15 @@ class FS(BasicModule):
         # top_k = torch.topk(selection[0, 0, :], 50).indices
 
         # x = x[:,:,top_k]
-        x = torch.mul(x, torch.clamp(self.feature_select, 0, 1))
-        x, _ = self.model(x)
-        return x, _
+        if self.training:
+            x = torch.mul(x, self.feature_select)
+            reg = torch.linalg.norm(self.feature_select, dim=2, ord=1).squeeze()
+            x, _ = self.model(x)
+            return x, reg
+        else:
+            x = torch.mul(x, self.feature_select)
+            x, _ = self.model(x)
+            return x
 
     def save(self, name=None, last=False):
         if name is None:

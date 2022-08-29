@@ -36,10 +36,12 @@ class BasicModule(nn.Module):
 
     def get_model_name(self):
         name = self.model_name + '_'
-        if self.config.use_all_features:
+        if self.config.feature_type == 'all':
             name += 'allfea_'
-        else:
+        elif self.config.feature_type == 'list':
             name += '_'.join(self.config.feature_list) + '_'
+        else:
+            name += self.config.feature_type + '_'
 
         name += str(self.config.lockback_window) + '_' \
                   + str(self.config.forecast_horizon) + '_'

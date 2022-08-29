@@ -30,7 +30,7 @@ class ResidualBlock(nn.Module):
 
 
 class DeepFolio(BasicModule):
-    def __init__(self, cnn_dim=16, incep_dim=32, lstm_dim=64):
+    def __init__(self, cnn_dim=32, incep_dim=64, lstm_dim=64):
         super().__init__()
         self.model_name = 'deepfolio'
         # convolution blocks
@@ -47,7 +47,7 @@ class DeepFolio(BasicModule):
         )
         self.layer2 = self._make_layer(cnn_dim, 2)
         self.conv3 = nn.Sequential(
-            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(1, 10)),
+            nn.Conv2d(in_channels=cnn_dim, out_channels=cnn_dim, kernel_size=(1, self.config.feature_dim//4)),
             nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(cnn_dim),
         )

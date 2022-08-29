@@ -30,17 +30,9 @@ class CNN(BasicModule):
             nn.Tanh(),
             nn.BatchNorm2d(32),
         )
-        # self.conv3 = nn.Sequential(
-        #     Learned_Aggregation_Layer(32),
-        #     nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1)),
-        #     nn.LeakyReLU(negative_slope=0.01),
-        #     nn.BatchNorm2d(32),
-        #     nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1)),
-        #     nn.LeakyReLU(negative_slope=0.01),
-        #     nn.BatchNorm2d(32),
-        # )
+
         self.conv3 = nn.Sequential(
-                nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, 5)),
+                nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(1, self.config.feature_dim//4)),
             nn.LeakyReLU(negative_slope=0.01),
             nn.BatchNorm2d(32),
             nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(4, 1), padding='same'),

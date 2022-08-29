@@ -25,8 +25,8 @@ def calculator_order_flows(curr_p, pre_p, curr_v, pre_v, is_bid=True):
             return curr_v
 
 
-def bid_ask_imbalance(data, deep=4, panda=True):
-    if panda:
+def bid_ask_imbalance(data, deep=4, version1=True):
+    if version1:
         bid_vol = []
         ask_vol = []
         for i in range(3, 3 + deep * 2, 2):
@@ -36,10 +36,10 @@ def bid_ask_imbalance(data, deep=4, panda=True):
         ask_vol = np.sum(ask_vol, axis=0)
         return np.subtract(bid_vol, ask_vol) / np.add(bid_vol, ask_vol)
     else:
-        bid_vol = data[21:21+deep]
-        ask_vol = data[31:31+deep]
-        bid_vol = np.sum(bid_vol)
-        ask_vol = np.sum(ask_vol)
+        bid_vol = data.iloc[:, 23:23+deep]
+        ask_vol = data.iloc[:, 33:33+deep]
+        bid_vol = np.sum(bid_vol, axis=1)
+        ask_vol = np.sum(ask_vol, axis=1)
         return np.subtract(bid_vol, ask_vol) / np.add(bid_vol, ask_vol)
 
 
@@ -191,8 +191,6 @@ def get_class_label(mid_price, horizontal, method=0):
     else:
         raise ValueError()
 
-
-
 def print_loss_graph(train_val_loss):
     train_val_loss = np.array(train_val_loss)
     fig = plt.figure()
@@ -205,7 +203,7 @@ def print_loss_graph(train_val_loss):
     plt.show()
 
 class tradebot:
-    def __init__(self, volume=1, fee=0.02, short=True):
+    def __init__(self, volume=0.1, fee=0.02, short=True):
         self.volume = volume
         self.open_price = 0
         self.side = 0 # buy:1 , sell:-1
@@ -272,16 +270,11 @@ class tradebot:
 
         return (prue_value[j] - prue_value[i]) / (prue_value[j])
 
-    def get_sharpe(self):
-        prue_value = (np.array(self.history) + 1)
-        prefix_max = np.maximum.accumulate(prue_value)
-        # i = np.argmax(prefix_max - self.history)  # 结束位置
-        i = np.argmax((prefix_max - prue_value)/prefix_max)
-        if i == 0:
-            return 0
-        j = np.argmax(prue_value[:i])  # 开始位置
-
-        return (prue_value[j] - prue_value[i]) / (prue_value[j])
+    # def get_sharpe(self):
+    #     prue_value = (np.array(self.history) + 1)
+    #     rets = (prue_value[-1] / prue_value[0])
+    #     exReturn = rets - 0.01 / 250
+    #     return np.sqrt(len(exReturn))*exReturn.mean()/exReturn.std()
 
 
 class trade_cache():

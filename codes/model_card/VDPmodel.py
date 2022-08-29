@@ -22,7 +22,7 @@ class ConcreteDropout(BasicModule):
             x, _ = self.model(x)
             return x, reg
         else:
-            x, z = self._concrete_dropout(x, self.p_logit)
+            # x, z = self._concrete_dropout(x, self.p_logit)
             x, _ = self.model(x)
             return x
 
