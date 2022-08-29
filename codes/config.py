@@ -5,7 +5,8 @@ import pandas as pd
 
 
 class Config:
-    SEED = 100
+    SEED = 135125
+    # SEED = 100
 ############################################################################################
 #   DataSet Setting
 ############################################################################################
@@ -13,7 +14,7 @@ class Config:
     train_ratio = 1.0
     # default save path: ./checkpoints
     # choose data set from: fi2010, BTC_50, BTC_14, ETH_14, BTC_10
-    name_dataset = "BTC_50"
+    name_dataset = "fi2010"
 
     # load data by days
     # [train begin,    train end,    test end]
@@ -24,7 +25,7 @@ class Config:
     # only for regression task
     regression = False
     # only for model accept time feature
-    use_time_feature = True
+    use_time_feature = False
 
     # input feature_type: 'all', a list of feature in feature_dic or selected features
     # feature_type = 'all'
@@ -114,8 +115,8 @@ class Config:
     # Choose model from LSTM DeepLOB TransformerEn
 
     # backbone = 'LSTM'
-    backbone = 'TransformerEn'
-    # backbone = 'DeepLOB'
+    # backbone = 'TransformerEn'
+    backbone = 'DeepLOB'
 
 
     # whether use selection model
@@ -124,8 +125,8 @@ class Config:
     # select_fun = 'WFS'
 
     batch_size = 512
-    lr = 0.0005
-    # lr = 0.005
+    # lr = 0.0005
+    lr = 0.01
     min_lr = lr / 20
     # min_lr = lr / 100
 
@@ -195,7 +196,7 @@ class Config:
     debug_num = 50000
 
     plot_forecast = False
-    backtesting = True
+    backtesting = False
 
     preprocess = True
     if name_dataset == 'fi2010':

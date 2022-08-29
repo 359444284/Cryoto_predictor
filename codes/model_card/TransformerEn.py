@@ -159,7 +159,7 @@ class TransformerEn(BasicModule):
             self.enc_embedding = DataEmbedding(self.config.feature_dim, self.config.tran_emb_dim, 'timeF', 's',
                                             0.1, lockback=self.config.lockback_window)
         else:
-            self.enc_embedding = DataEmbedding_wo_temp(self.config.feature_dim, self.config.tran_emb_dim, 'timeF', 's',
+            self.enc_embedding = DataEmbedding_wo_temp(32, self.config.tran_emb_dim, 'timeF', 's',
                                             0.1)
         self.encoder = Encoder(
             [
@@ -202,7 +202,6 @@ class TransformerEn(BasicModule):
         Returns:
             output Tensor of shape [batch_size , n_class]
         """
-
 
         B, L, C = src.shape
 
