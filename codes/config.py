@@ -13,12 +13,12 @@ class Config:
     # train_ratio = 1.0
     # default save path: ./checkpoints
     # choose data set from: fi2010, BTC_50, BTC_14, ETH_14, BTC_10
-    name_dataset = "fi2010"
+    name_dataset = "BTC_50"
 
     # load data by days
     # [train begin,    train end,    test end]
-    split_data = [0, 6, 10]
-    # split_data = [0, 53, 53]
+    # split_data = [0, 6, 10]
+    split_data = [0, 53, 53]
     print(split_data)
 
     # only for regression task
@@ -71,8 +71,8 @@ class Config:
     feature_dic['WVPS'] = [i for i in range(141, 141 + 1)]
     feature_dic['PD'] = [i for i in range(142, 142 + 18)]
 
-    # feature_index = [0, 1, 2, 3, 62, 63] # use for backtesting [date, mid-price, bid1, ask1]
-    feature_index = [0, 1, 2, 3] # use for backtesting [date, mid-price, bid1, ask1]
+    feature_index = [0, 1, 2, 3, 62, 63] # use for backtesting [date, mid-price, bid1, ask1]
+    # feature_index = [0, 1, 2, 3] # use for backtesting [date, mid-price, bid1, ask1]
 
     if feature_type == 'all':
         for sublist in feature_dic.values():

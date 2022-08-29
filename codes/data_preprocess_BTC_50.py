@@ -24,6 +24,8 @@ print(trade_files)
 # books.drop_duplicates(inplace=True)
 # print('after drop: ', len(books))
 begin_day = 0
+# end_day = len(book_files)
+end_day = 10
 print(books_dir + book_files[begin_day])
 print(books_dir + book_files[len(book_files)-1])
 for dy in range(begin_day, len(book_files)):
