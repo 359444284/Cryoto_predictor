@@ -147,7 +147,6 @@ class Deeplob_CNN(nn.Module):
 #     x = x + self.pe[:x.size(0)]
 #     return x
 
-
 # https://github.com/ctxj/Time-Series-Transformer-Pytorch/blob/main/transformer_model.ipynb
 class TransformerEn(BasicModule):
     def __init__(self):
