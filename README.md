@@ -1,6 +1,6 @@
 # Cryoto_predictor
 
-# High Frequency Cryptocurrency Trading Signals Forecas
+# High Frequency Cryptocurrency Trading Signals Forecas -- CHAOYU DENG
 
 ## User GuideLines:
 A detailed usage guide can be found in the Charpter: User Guide of the paper, and here are some basic usage instructions.
