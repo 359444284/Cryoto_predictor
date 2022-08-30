@@ -1,21 +1,9 @@
 # Cryoto_predictor
 
-# Team：CHAOYU DENG in SemEval 2022 Task 4: Patronizing and Condescending Language Detection
-member： CHAOYU DENG， Kang, Yining， Yao, Jinli
+# High Frequency Cryptocurrency Trading Signals Forecas
 
 ## Environment Configuration:
-Install python 3.6
-https://www.python.org/downloads/release/python-368/
-
-- Pytorch: pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio===0.10.0-fhttps://download.pytorch.org/whl/torch_stable.html
-- transformers:  pip install transformers==4.16.2
-- sentencepiece:  pip install sentencepiece==0.1.91
-- numpy:  pip install numpy==1.19.4
-- matplotlib:  pip install matplotlib==3.3.3
-- scikit-learn:  pip install scikit-learn==1.0.1
-- pandas:  pip install pandas==1.3.4
-- Pillow： pip install Pillow==8.0.1
-- tqdm: pip install tqdm
+see requirements.txt
 
 ## Models Used in Essay
 
