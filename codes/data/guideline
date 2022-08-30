@@ -1,27 +1,27 @@
 Please Create following directory if you need to verify our result.
 
 BTC-50 data set:
-    BTC_50_data\book: the raw order book data for BTC-50
-    BTC_50_data\trade: the raw trade data for BTC-50
-    You can create the BTC_50 data set by using: python data_preprocess_BTC_50.py
+    /data/BTC_50_data/book: the raw order book data for BTC-50
+    /data/BTC_50_data/trade: the raw trade data for BTC-50
+    You can create the BTC-50 data set by using: python data_preprocess_BTC_50.py and modify the target_dir
 
-    BTC_50: BTC-50 dataset with all features and labels
+    /data/BTC_50: BTC-50 dataset with all features and labels
 
-    BTC_10: First 10 days for BTC_50 with all features and labels
+    /data/BTC_10: First 10 days for BTC_50 with all features and labels
 
 BTC-ETH-14 data set:
-    You can create the BTC_50 data set by using: python data_preprocess_BTC_ETH_50.py
+    You can create BTC-14 and ETH-14 data sets by using: python data_preprocess_BTC_ETH_14.py
 
-    BTC_14_data\book: the raw order book data for BTC-14
-    BTC_14_data\trade: the raw trade data for BTC-14
-    BTC_14: BTC-14 dataset with all features and labels
+    /data/BTC_14_data/book: the raw order book data for BTC-14
+    /data/BTC_14_data/trade: the raw trade data for BTC-14
+    /data/BTC_14: BTC-14 dataset with all features and labels
 
-    ETH_14_data\book: the raw order book data for ETH-14
-    ETH_14_data\trade: the raw trade data for ETH-14
-    ETH_14: ETH-14 dataset with all features and labels
+    /data/ETH_14_data/book: the raw order book data for ETH-14
+    /data/ETH_14_data/trade: the raw trade data for ETH-14
+    /data/ETH_14: ETH-14 dataset with all features and labels
 
 FI-2010:
-    FI_2010: 7 day train and 3 day test set for FI-2010 data set
+    /data/FI_2010: 7 day train and 3 day test set for FI-2010 data set
 
 
 BTC_50 and FI-2010 can be download form my google drive directly:
