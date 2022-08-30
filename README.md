@@ -5,6 +5,9 @@
 ## Environment Configuration:
 see requirements.txt
 
+## Data Configuration:
+see ./codes/data/guideline.txt
+
 ## Models Used in Essay
 
 Defult Model: Bert_lastClsSep lr:5e-6 elr 0.9 batch size 4 loss DI 0.3 + MTD + ema + clamp + R-drop seed:15 (val: 0.5764    0.6633    0.6168)
