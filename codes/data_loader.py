@@ -190,9 +190,9 @@ class LoadDataset:
         else:
             pass
         if self.config.use_time_feature:
-            data_stamp = pd.to_datetime(date.values, unit='ms')
-            # data_stamp = time_features(pd.to_datetime(date.values, unit='ms'), freq=self.config.freq)
-            # data_stamp = data_stamp.transpose(1, 0)
+            # data_stamp = pd.to_datetime(date.values, unit='ms')
+            data_stamp = time_features(pd.to_datetime(date.values, unit='ms'), freq=self.config.freq)
+            data_stamp = data_stamp.transpose(1, 0)
             X, Y = features, target
 
             if self.config.regression:

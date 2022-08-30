@@ -10,15 +10,16 @@ class Config:
 #   DataSet Setting
 ############################################################################################
     train_ratio = 0.8
-    # train_ratio = 1.0
     # default save path: ./checkpoints
     # choose data set from: fi2010, BTC_50, BTC_14, ETH_14, BTC_10
-    name_dataset = "BTC_50"
+    name_dataset = "BTC_14"
 
     # load data by days
     # [train begin,    train end,    test end]
-    # split_data = [0, 6, 10]
-    split_data = [0, 53, 53]
+    split_data = [0, 6, 10]
+    # split_data = [4, 14, 14]
+    # split_data = [36, 46, 46]
+    # split_data = [0, 14, 14]
     print(split_data)
 
     # only for regression task
@@ -71,8 +72,7 @@ class Config:
     feature_dic['WVPS'] = [i for i in range(141, 141 + 1)]
     feature_dic['PD'] = [i for i in range(142, 142 + 18)]
 
-    feature_index = [0, 1, 2, 3, 62, 63] # use for backtesting [date, mid-price, bid1, ask1]
-    # feature_index = [0, 1, 2, 3] # use for backtesting [date, mid-price, bid1, ask1]
+    feature_index = [0, 1, 2, 3] # use for backtesting [date, mid-price, bid1, ask1]
 
     if feature_type == 'all':
         for sublist in feature_dic.values():
@@ -95,8 +95,7 @@ class Config:
                     [114, 113, 112, 42, 43, 137, 138, 62, 93, 63, 115, 22, 92, 23, 102, 103, 94, 117, 141, 83, 61, 84,
                      139, 140, 116])
             else:
-                pass
-                # feature_index.extend([102, 137, 138, 139, 140, 42, 43, 112, 113, 114, 22, 23, 92])
+                feature_index.extend([102, 137, 138, 139, 140, 42, 43, 112, 113, 114, 22, 23, 92])
         else:
             feature_index.extend([102, 137, 138, 139, 140, 42, 52, 112, 113, 114, 22, 32, 92])
 
@@ -115,9 +114,9 @@ class Config:
 
     # Choose model from LSTM DeepLOB TransformerEn
 
-    # backbone = 'LSTM'
+    backbone = 'LSTM'
     # backbone = 'TransformerEn'
-    backbone = 'DeepLOB'
+    # backbone = 'DeepLOB'
 
 
     # whether use selection model
@@ -126,15 +125,15 @@ class Config:
     # select_fun = 'WFS'
 
     batch_size = 512
-    # lr = 0.0005
-    lr = 0.01
+    lr = 0.0005
+    # lr = 0.01
     min_lr = lr / 20
     # min_lr = lr / 100
 
     # backtesting setting
     trade_fee = 0.02  # unit %
     trade_delay = 1  # unit 100ms
-    signal_threshold = 0.95  #
+    signal_threshold = 0.75  #
 
     # Choose Normalizer from: general, daily, LC-Norm
     Normalizer = 'LC-Norm'
@@ -197,7 +196,7 @@ class Config:
     debug_num = 50000
 
     plot_forecast = False
-    backtesting = False
+    backtesting = True
 
     preprocess = True
     if name_dataset == 'fi2010':

@@ -49,7 +49,6 @@ if __name__ == '__main__':
     # save_root = './checkpoints/BTC_ETH_14_ours_ETH/'
 
     for i in range(0, config.num_of_day - 9, 4):
-    # for i in range(36, config.num_of_day - 9, 4):
         config.split_data = [i, i + 6, i + 10]
         print('days: ' + str(config.split_data))
         # collectors
