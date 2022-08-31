@@ -16,7 +16,7 @@ see ./codes/data/guideline.txt
 ## Run Experiments:
         cd codes
 
-Defult Model: LSTM lr:0.01 lr-decay: 0.8 batch_size: 512 loss: Dice loss with alpha = 0.5
+Defult Model: DeepLOB lr:0.01 lr-decay: 0.8 batch_size: 512 loss: Dice loss with alpha = 0.5
 
 Defult Dateset: FI-2010
 
