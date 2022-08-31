@@ -18,15 +18,15 @@ Defult Model: LSTM lr:0.0005 lr-decay: 0.8 batch_size: 512 loss: Dice loss with 
 
 Defult Dateset: BTC-50
 
-Begin train and Evaluation:
+Begin Train and Evaluation:
         
         python main.py
         
-Only Evaluation:
+Evaluation:
 
         python predict.py
 
-Perform Cross-Validation
+Cross-Validation
 
         python cross_validation.py
 
