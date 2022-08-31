@@ -28,7 +28,7 @@ Evaluation:
 
         python predict.py
 
-Cross-Validation
+Cross-Validation For Our Cryptocurrency Dataset
 
         python cross_validation.py
 
