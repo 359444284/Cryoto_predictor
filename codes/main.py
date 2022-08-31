@@ -37,12 +37,14 @@ def set_seed(seed):
 
 if __name__ == '__main__':
     config = config.Config()
+    # reproduce ability , delete to get a faster training speed
     set_seed(config.SEED)
+
     data_set = data_loader.LoadDataset(config)
 
     if config.name_dataset == 'fi2010':
         train_dic = data_set.get_FI_data('train')
-        valid_dic = data_set.get_FI_data('test')
+        valid_dic = data_set.get_FI_data('val')
         train_set = data_loader.ProcessDataset(train_dic, with_label=True, config=config)
         valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
     else:
