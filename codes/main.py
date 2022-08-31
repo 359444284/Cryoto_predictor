@@ -101,17 +101,14 @@ if __name__ == '__main__':
         # loss_fn = nn.SmoothL1Loss(reduction='mean').to(device)
         loss_fn = nn.MSELoss(reduction='mean').to(device)
     else:
-        # loss_fn = nn.CrossEntropyLoss().to(device)
-        # loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1).to(device)
-        loss_fn = DiceLoss(square_denominator=True,
-                    alpha=0.01, with_logits=False,
+        if config.loss_fun == 'CE':
+            loss_fn = nn.CrossEntropyLoss().to(device)
+        else:
+            loss_fn = DiceLoss(square_denominator=True,
+                    alpha=config.DSC_alpha, with_logits=False,
                     index_label_position=True,
                     reduction="mean", smooth=1.0).to(device)
-        # loss_fn = DiceLoss(square_denominator=True,
-        #                    alpha=0.2, with_logits=False,
-        #                    index_label_position=True,
-        #                    reduction="mean", smooth=1.0).to(device)
-    # 0.91819 0.2
+
     trainer.train_epoch(config, model, optimizer, device, loss_fn, train_loader,
                         valid_loader, epochs=epoch, scheduler=scheduler)
     model.load(last=False)

@@ -41,6 +41,7 @@ if __name__ == '__main__':
         model = getattr(model_card, config.select_fun_dic[config.select_fun])(model)
     print(model.get_model_name())
 
+    #  load the pre-trained model
     model.load()
 
     model = model.to(device)

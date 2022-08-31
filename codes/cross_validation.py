@@ -76,7 +76,7 @@ if __name__ == '__main__':
         save_path = save_root + str(config.split_data) + model.get_model_name()
         model = model.to(device)
         # if fine-tune
-        # model.load(save_path)
+        model.load(save_path)
 
         optimizer = Adam(model.parameters(), lr=config.lr)
         epoch = 50
@@ -86,11 +86,13 @@ if __name__ == '__main__':
         if config.regression:
             loss_fn = nn.MSELoss(reduction='mean').to(device)
         else:
-            # loss_fn = nn.CrossEntropyLoss().to(device)
-            loss_fn = DiceLoss(square_denominator=True,
-                               alpha=0.01, with_logits=False,
-                               index_label_position=True,
-                               reduction="mean", smooth=1.0).to(device)
+            if config.loss_fun == 'CE':
+                loss_fn = nn.CrossEntropyLoss().to(device)
+            else:
+                loss_fn = DiceLoss(square_denominator=True,
+                                   alpha=config.DSC_alpha, with_logits=False,
+                                   index_label_position=True,
+                                   reduction="mean", smooth=1.0).to(device)
 
         # trainer.train_epoch(config, model, optimizer, device, loss_fn, train_loader,
         #                     valid_loader, epochs=epoch, scheduler=scheduler, save_path=save_path)
