@@ -135,7 +135,7 @@ class Config:
     # loss_fun = 'CE'
     loss_fun = 'DSC'
     # Alpha for DSC
-    DSC_alpha = 0.4
+    DSC_alpha = 0.5
 
     # backtesting setting
     trade_fee = 0.02  # unit %
