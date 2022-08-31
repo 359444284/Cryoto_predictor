@@ -120,8 +120,8 @@ if __name__ == '__main__':
         test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
         test_loader = DataLoader(test_set, batch_size=config.batch_size, prefetch_factor=2,
                                  num_workers=8, drop_last=True, pin_memory=True)
-        val_loss, r2, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
-        print(r2)
+        val_loss, f1, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
+        print(f1)
     else:
         for i in range(0, 4):
             split = [0, 6+i, 7+i]
@@ -130,11 +130,11 @@ if __name__ == '__main__':
             test_loader = DataLoader(test_set, batch_size=config.batch_size, prefetch_factor=2,
                                      num_workers=8, drop_last=True, pin_memory=True)
 
-            val_loss, r2, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
-            print(r2)
+            val_loss, f1, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
+            print(f1)
         test_dic = data_set.get_crypto_data('test')
         test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
         test_loader = DataLoader(test_set, batch_size=config.batch_size, prefetch_factor=2,
                                  num_workers=8, drop_last=True, pin_memory=True)
-        val_loss, r2, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
-        print(r2)
+        val_loss, f1, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
+        print(f1)

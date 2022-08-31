@@ -53,7 +53,7 @@ if __name__ == '__main__':
         loss_fn = nn.MSELoss(reduction='mean').to(device)
     else:
         loss_fn = nn.CrossEntropyLoss().to(device)
-    val_loss, r2, backtest = trainer.evaluate(model, test_loader, device, loss_fn, config)
+    val_loss, f1, backtest = trainer.evaluate(model, test_loader, device, loss_fn, config)
 
 
     for name, param in model.named_parameters():
