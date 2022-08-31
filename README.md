@@ -3,7 +3,7 @@
 # High Frequency Cryptocurrency Trading Signals Forecast
 
 ## User GuideLines:
-A detailed usage guide can be found in the Charpter: User Guide of the paper, and here are some basic usage instructions.
+A detailed usage guide can be found in the UserGuide.pdf and here are some basic usage instructions.
 
 
 
