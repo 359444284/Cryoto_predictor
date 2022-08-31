@@ -94,8 +94,8 @@ if __name__ == '__main__':
                                    index_label_position=True,
                                    reduction="mean", smooth=1.0).to(device)
 
-        # trainer.train_epoch(config, model, optimizer, device, loss_fn, train_loader,
-        #                     valid_loader, epochs=epoch, scheduler=scheduler, save_path=save_path)
+        trainer.train_epoch(config, model, optimizer, device, loss_fn, train_loader,
+                            valid_loader, epochs=epoch, scheduler=scheduler, save_path=save_path)
 
         model.load(save_path)
         for j in range(0, 4):

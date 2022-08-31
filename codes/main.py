@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     if config.name_dataset == 'fi2010':
         train_dic = data_set.get_FI_data('train')
-        valid_dic = data_set.get_FI_data('val')
+        valid_dic = data_set.get_FI_data('test')
         train_set = data_loader.ProcessDataset(train_dic, with_label=True, config=config)
         valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
     else:
@@ -102,8 +102,10 @@ if __name__ == '__main__':
         loss_fn = nn.MSELoss(reduction='mean').to(device)
     else:
         if config.loss_fun == 'CE':
+            print('Using Cross Entropy')
             loss_fn = nn.CrossEntropyLoss().to(device)
         else:
+            print('Using Self-adjust Dice Loss')
             loss_fn = DiceLoss(square_denominator=True,
                     alpha=config.DSC_alpha, with_logits=False,
                     index_label_position=True,

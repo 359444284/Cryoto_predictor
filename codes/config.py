@@ -124,16 +124,18 @@ class Config:
     batch_size = 512
     if name_dataset == 'fi2010':
         lr = 0.01
+        # the minimum learning rate will be reach.
+        min_lr = lr / 100
     else:
         lr = 0.0005
+        # the minimum learning rate will be reach.
+        min_lr = lr / 20
 
     # Choose Loss Function Between Cross Entropy (CE) and Self-adjust Dice Loss (DSC)
-    loss_fun = 'CE'
+    # loss_fun = 'CE'
+    loss_fun = 'DSC'
     # Alpha for DSC
-    DSC_alpha = 0.2
-
-    # the minimum learning rate will be reach.
-    min_lr = lr / 20
+    DSC_alpha = 0.4
 
     # backtesting setting
     trade_fee = 0.02  # unit %

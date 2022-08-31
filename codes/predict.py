@@ -43,6 +43,7 @@ if __name__ == '__main__':
 
     #  load the pre-trained model
     model.load()
+    # model.load(name='checkpoints/FI-2010/best_deeplob_LOB_100_100_.pt')
 
     model = model.to(device)
     print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
