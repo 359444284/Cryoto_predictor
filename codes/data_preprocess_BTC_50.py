@@ -10,9 +10,9 @@ import tools
 
 # books_dir = 'G:\\我的云端硬盘\\crypto_predict\\books\\'
 # trades_dir = 'G:\\我的云端硬盘\\crypto_predict\\trades\\'
-books_dir = './data/BTC_50_data/book/'
-trades_dir = './data/BTC_50_data/trade/'
-target_dir = './data/BTC_50/'
+books_dir = './data/BTC_14_data/book/'
+trades_dir = './data/BTC_14_data/trade/'
+target_dir = './data/BTC_14/'
 
 book_files = sorted(os.listdir(books_dir))
 print(len(book_files))
@@ -23,9 +23,10 @@ print(trade_files)
 # print('before drop: ', len(books))
 # books.drop_duplicates(inplace=True)
 # print('after drop: ', len(books))
-begin_day = 0
+begin_day = 2
 # end_day = len(book_files)
-end_day = 10
+end_day = 16
+stride = 30
 print(books_dir + book_files[begin_day])
 print(books_dir + book_files[len(book_files)-1])
 for dy in range(begin_day, len(book_files)):
@@ -45,6 +46,8 @@ for dy in range(begin_day, len(book_files)):
     print('before drop: ', len(trades))
     trades.drop_duplicates(inplace=True)
     print('after drop: ', len(trades))
+    books = books[::stride]
+    trades = trades[::stride]
 
     # for columnname in books.columns:
     #     if books[columnname].dtype == 'float64':
@@ -64,7 +67,7 @@ for dy in range(begin_day, len(book_files)):
 
     gap = books['time'].to_numpy()
     gap = [gap[i + 1] - gap[i] for i in range(len(gap) - 1)]
-    print('max gap: ', max(gap), '  min gap: ', min(gap))
+    print('max gap: ', max(gap), '  min gap: ', min(gap), 'mean_gap', np.mean(gap))
     # max_pos = np.argmax(gap)
     # min_pos = np.argmin(gap)
     # print(books[(max_pos - 3):(max_pos + 3)])
@@ -120,7 +123,7 @@ for dy in range(begin_day, len(book_files)):
     ofi_features = np.concatenate([np.subtract(bof[i], aof[i]).reshape(len(bof[i]), 1) for i in range(len(bof))], axis=1)
     # #
     of_features = np.concatenate([np.array(bof).T, np.array(aof).T], axis=1)
-    TC_IMBAL, TV_IMBAL, BEGIN_TC = tools.get_TCI_and_TVI(books, trades)
+    TC_IMBAL, TV_IMBAL, BEGIN_TC = tools.get_TCI_and_TVI(books, trades, duration=1000*stride)
 
     mid_price_volatillity, BEGIN_MP = tools.get_midPrice_volatility(books)
 
@@ -160,7 +163,7 @@ for dy in range(begin_day, len(book_files)):
     S_V = np.concatenate( [[books.iloc[:,i+20]/mean_vol] for i in range(3, 23, 1)], axis=0).T
     S_Lob = np.log(np.concatenate([S_P, S_V], axis=1))
 
-    BEGIN = max(BEGIN_TC, BEGIN_MP, 101)
+    BEGIN = max(BEGIN_TC, BEGIN_MP, 15)
     if dy > begin_day:
         assert curr_idx > BEGIN
         BEGIN = curr_idx
@@ -169,7 +172,7 @@ for dy in range(begin_day, len(book_files)):
 
     FINAL_SIZE = len(books) - BEGIN
     if dy < len(book_files) -1:
-        END = -500
+        END = -500//stride
         FINAL_SIZE += END
 
 
@@ -254,12 +257,12 @@ for dy in range(begin_day, len(book_files)):
     feature_df = pd.DataFrame(feature_list)
     _, month, day = book_files[dy].split('_')
     print(month, day)
-    if END:
-        prev_book = books[-(500+END):-END]
-        prev_trade = trades[-(500+END):-END]
+    if dy == begin_day:
+        prev_book = books[-(500//stride+END):-END]
+        prev_trade = trades[-(500//stride+END):-END]
         print(len(prev_book))
     else:
-        prev_book = books[-500:]
-        prev_trade = trades[-500:]
+        prev_book = books[-500//stride:]
+        prev_trade = trades[-500//stride:]
     print(len(feature_df))
     feature_df.to_csv(target_dir + 'feature'+month+day, index=False)

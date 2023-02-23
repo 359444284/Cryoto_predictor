@@ -14,7 +14,7 @@ from torch.optim import AdamW, lr_scheduler, Adam
 from loss_funs import DiceLoss
 import seaborn as sns
 import config
-import data_loader
+from data_provider import datasets, data_loader
 import trainer
 import model_card
 
@@ -58,8 +58,8 @@ if __name__ == '__main__':
         data_set = data_loader.LoadDataset(config)
         train_dic = data_set.get_crypto_data('train')
         valid_dic = data_set.get_crypto_data('val')
-        train_set = data_loader.ProcessDataset(train_dic, with_label=True, config=config)
-        valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
+        train_set = datasets.get_dataset(train_dic, with_label=True, config=config)
+        valid_set = datasets.get_dataset(valid_dic, with_label=True, config=config)
         train_loader = DataLoader(train_set, batch_size=config.batch_size, prefetch_factor=2,
                                   num_workers=8, drop_last=True, pin_memory=True, shuffle=True)
         valid_loader = DataLoader(valid_set, batch_size=config.batch_size, prefetch_factor=2,
@@ -94,8 +94,8 @@ if __name__ == '__main__':
                                    index_label_position=True,
                                    reduction="mean", smooth=1.0).to(device)
 
-        trainer.train_epoch(config, model, optimizer, device, loss_fn, train_loader,
-                            valid_loader, epochs=epoch, scheduler=scheduler, save_path=save_path)
+        # trainer.train_epoch(config, model, optimizer, device, loss_fn, train_loader,
+        #                     valid_loader, epochs=epoch, scheduler=scheduler, save_path=save_path)
 
         model.load(save_path)
         for j in range(0, 4):

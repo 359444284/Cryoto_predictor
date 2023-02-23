@@ -3,11 +3,10 @@ import multiprocessing.dummy
 
 import pandas as pd
 import numpy as np
-import torch
 from joblib import Parallel, delayed
-from torch.utils.data import Dataset
 
-from utils.timefeatures import time_features
+
+from ..utils.timefeatures import time_features
 from sklearn.preprocessing import StandardScaler
 
 def scale_function(data, mean, std):
@@ -184,40 +183,11 @@ class LoadDataset:
             features = test_input
             target = test_target
 
-        if self.config.regression:
-            target = np.log(target)
-            # pass
-        else:
-            pass
         if self.config.use_time_feature:
             # data_stamp = pd.to_datetime(date.values, unit='ms')
             data_stamp = time_features(pd.to_datetime(date.values, unit='ms'), freq=self.config.freq)
             data_stamp = data_stamp.transpose(1, 0)
             X, Y = features, target
-
-            if self.config.regression:
-                data_stamp = data_stamp[self.config.forecast_horizon:]
-                X = X[self.config.forecast_horizon:]
-                Y = pd.DataFrame(Y)
-                Y = (Y - Y.shift(self.config.forecast_horizon)).to_numpy()[self.config.forecast_horizon:]
-            else:
-                # X = np.lib.stride_tricks.sliding_window_view(X, self.config.lockback_window, axis=0).transpose(0, 2, 1)
-                # Y = Y[self.config.lockback_window - 1:]
-                # data_stamp = np.lib.stride_tricks.sliding_window_view(data_stamp, self.config.lockback_window, axis=0).transpose(0, 2, 1)
-                # if self.config.Normalizer == 'LC-Norm':
-                #     X = np.lib.stride_tricks.sliding_window_view(X, self.config.LC_window, axis=0).transpose(
-                #         0, 2, 1)
-                #     Y = Y[self.config.LC_window - 1:]
-                #     data_stamp = np.lib.stride_tricks.sliding_window_view(data_stamp, self.config.LC_window,
-                #                                                           axis=0).transpose(0, 2, 1)
-                # else:
-                #     X = np.lib.stride_tricks.sliding_window_view(X, self.config.lockback_window, axis=0).transpose(0, 2,
-                #                                                                                                    1)
-                #     Y = Y[self.config.lockback_window - 1:]
-                #     data_stamp = np.lib.stride_tricks.sliding_window_view(data_stamp, self.config.lockback_window,
-                #                                                           axis=0).transpose(0, 2, 1)
-
-                assert (len(X) == len(Y) == len(data_stamp))
 
             return {
                 'stamp': data_stamp,
@@ -243,29 +213,26 @@ class LoadDataset:
                         Y = Y[self.config.LC_window - 1:]
 
                         # do LC-norm within loading the date set
-                        # X = np.lib.stride_tricks.sliding_window_view(X, self.config.lockback_window, axis=0).transpose(0, 2, 1)
-                        #
-                        # mean = np.mean(X, axis=1)
-                        # print(mean.shape)
-                        # std_list = []
-                        # chunk = math.ceil(len(X) / 50000)
-                        # num_chunk = len(X)//chunk
-                        # for i in range(chunk):
-                        #     if i != chunk-1:
-                        #         std = np.std(X[num_chunk*i:num_chunk*(i+1)], axis=1)
-                        #     else:
-                        #         std = np.std(X[num_chunk * i:], axis=1)
-                        #     std_list.append(std)
-                        # print('ok')
-                        # std = np.concatenate(std_list, axis=0)
-                        # std = std + 1e-8
-                        # print(std.shape)
-                        # X = X[:, -1, :]
-                        #
-                        # X = np.subtract(X, mean)
-                        # X /= std
-                        # print('ok2')
-                        # Y = Y[self.config.lockback_window - 1:]
+                        if self.config.backbone == "Traditional_ML":
+                            mean = np.mean(X, axis=1)
+                            print(mean.shape)
+                            std_list = []
+                            chunk = math.ceil(len(X) / 50000)
+                            num_chunk = len(X)//chunk
+                            for i in range(chunk):
+                                if i != chunk-1:
+                                    std = np.std(X[num_chunk*i:num_chunk*(i+1)], axis=1)
+                                else:
+                                    std = np.std(X[num_chunk * i:], axis=1)
+                                std_list.append(std)
+                            std = np.concatenate(std_list, axis=0)
+                            std = std + 1e-8
+                            print(std.shape)
+                            X = X[:, -1, :]
+
+                            X = np.subtract(X, mean)
+                            X /= std
+                            print('normalization finished')
 
                     else:
                         X = np.lib.stride_tricks.sliding_window_view(X, self.config.lockback_window, axis=0).transpose(0, 2, 1)
@@ -276,87 +243,6 @@ class LoadDataset:
                 'X': X,
                 'Y': Y
             }
-
-
-class ProcessDataset(Dataset):
-    def __init__(self, data_dic, with_label, config):
-        self.config = config
-        self.inputs = data_dic['X']
-        self.regression = self.config.regression
-        self.targets = data_dic['Y']
-        if config.use_time_feature:
-            self.stamp = data_dic['stamp']
-        self.with_label = with_label
-
-    def __len__(self):
-        if not self.config.preprocess and self.regression:
-            return len(self.inputs) - self.config.lockback_window - self.config.forecast_horizon + 1
-        else:
-            return len(self.inputs)
-
-    def __getitem__(self, item):
-        if self.config.use_time_feature:
-            if not self.regression:
-                feature = self.inputs[item].copy()
-                target = self.targets[item]
-                feature_mask = self.stamp[item]
-                if self.config.Normalizer == 'LC-Norm':
-                    mean = np.mean(feature, axis=0, keepdims=True)[:, 3:]
-                    std = np.std(feature, axis=0, keepdims=True)[:, 3:]
-                    feature[:, 3:] = (feature[:, 3:] - mean) / (std + 1e-8)
-                    feature = feature[-self.config.lockback_window:, :]
-
-                return {
-                    'input': torch.tensor(feature, dtype=torch.float32),
-                    'target': torch.tensor(target, dtype=(torch.float32 if self.regression else torch.long)),
-                    'inp_mask': torch.tensor(feature_mask, dtype=torch.float32),
-                }
-            else:
-                s_begin = item
-                s_end = s_begin + self.config.lockback_window
-                r_begin = s_end - self.config.lockback_window//2
-                pre_star = s_end
-                r_end = pre_star + self.config.forecast_horizon
-
-                seq_x = self.inputs[s_begin:s_end]
-                seq_x = np.concatenate([seq_x, self.targets[s_begin:s_end].reshape(-1, 1)], axis=1)
-
-                # seq_y = self.targets[pre_star:r_end]
-                seq_y = self.targets[pre_star:r_end].reshape(-1, 1)
-                seq_y = np.concatenate([self.inputs[pre_star:r_end], seq_y], axis=1)
-
-                seq_x_mark = self.stamp[s_begin:s_end]
-                seq_y_mark = self.stamp[r_begin:r_end]
-                return {
-                    'input': torch.tensor(seq_x, dtype=torch.float32),
-                    'target': torch.tensor(seq_y, dtype=(torch.float32 if self.regression else torch.long)),
-                    'inp_mask': torch.tensor(seq_x_mark, dtype=torch.float32),
-                    'tar_mask': torch.tensor(seq_y_mark, dtype=(torch.float32)),
-                }
-        else:
-            if not self.config.preprocess:
-                feature = self.inputs[item:(item + self.config.lockback_window)]
-                target = np.array([self.targets[item + j] - self.targets[item]
-                                   for j in range(1, self.config.forecast_horizon + 1, self.config.forecast_stride)])
-                if self.targets[item + self.config.forecast_horizon] == 0:
-                    raise ValueError
-            else:
-                feature = self.inputs[item].copy()
-                target = self.targets[item]
-                if self.config.Normalizer == 'LC-Norm':
-                    mean = np.mean(feature, axis=0, keepdims=True)[:, 3:]
-                    std = np.std(feature, axis=0, keepdims=True)[:, 3:]
-                    feature[:, 3:] = (feature[:, 3:] - mean) / (std + 1e-8)
-                    feature = feature[-self.config.lockback_window:, :]
-                    if self.config.name_dataset=='fi2010':
-                        mean = np.mean(feature, axis=0, keepdims=True)
-                        std = np.std(feature, axis=0, keepdims=True)
-                        feature = (feature - mean) / (std + 1e-8)
-                        feature = feature[-self.config.lockback_window:, :]
-            return {
-                    'input': torch.tensor(feature, dtype=torch.float32),
-                    'target': torch.tensor(target, dtype=(torch.float32 if self.regression else torch.long))
-                }
 
 
 

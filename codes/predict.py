@@ -11,9 +11,9 @@ from torch.utils.data import DataLoader
 from torch.optim import AdamW, lr_scheduler, Adam
 import seaborn as sns
 import config
-import data_loader
 import trainer
 import model_card
+from data_provider import datasets, data_loader
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 if __name__ == '__main__':
@@ -23,18 +23,18 @@ if __name__ == '__main__':
     if config.name_dataset == 'fi2010':
         valid_dic = data_set.get_FI_data('val')
         test_dic = data_set.get_FI_data('test')
-        valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
-        test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
+        valid_set = datasets.get_dataset(valid_dic, with_label=True, config=config)
+        test_set = datasets.get_dataset(test_dic, with_label=True, config=config)
     else:
         valid_dic = data_set.get_crypto_data('val')
         test_dic = data_set.get_crypto_data('test')
-        valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
-        test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
+        valid_set = datasets.get_dataset(valid_dic, with_label=True, config=config)
+        test_set = datasets.get_dataset(test_dic, with_label=True, config=config)
 
     print(len(valid_set))
     print(len(test_set))
-    valid_loader = DataLoader(valid_set, batch_size=config.batch_size, drop_last=True, num_workers=8, pin_memory=True)
-    test_loader = DataLoader(test_set, batch_size=config.batch_size, drop_last=True, num_workers=8, pin_memory=True)
+    valid_loader = DataLoader(valid_set, batch_size=config.batch_size, drop_last=True, num_workers=0, pin_memory=True)
+    test_loader = DataLoader(test_set, batch_size=config.batch_size, drop_last=True, num_workers=0, pin_memory=True)
     model = getattr(model_card, config.backbone)()
     if config.select_fun:
         print('use selection method')
@@ -42,8 +42,8 @@ if __name__ == '__main__':
     print(model.get_model_name())
 
     #  load the pre-trained model
-    model.load()
-    # model.load(name='checkpoints/FI-2010/best_deeplob_LOB_100_100_.pt')
+    # model.load()
+    model.load(name='checkpoints/BTC_10/best_lstm_selected_100_3_.pt')
 
     model = model.to(device)
     print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))

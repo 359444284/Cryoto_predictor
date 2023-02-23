@@ -14,9 +14,9 @@ from torch.optim import AdamW, lr_scheduler, Adam
 from loss_funs import DiceLoss
 import seaborn as sns
 import config
-import data_loader
 import trainer
 import model_card
+from data_provider import datasets, data_loader
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -45,13 +45,13 @@ if __name__ == '__main__':
     if config.name_dataset == 'fi2010':
         train_dic = data_set.get_FI_data('train')
         valid_dic = data_set.get_FI_data('val')
-        train_set = data_loader.ProcessDataset(train_dic, with_label=True, config=config)
-        valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
+        train_set = datasets.get_dataset(train_dic, with_label=True, config=config)
+        valid_set = datasets.get_dataset(valid_dic, with_label=True, config=config)
     else:
         train_dic = data_set.get_crypto_data('train')
         valid_dic = data_set.get_crypto_data('val')
-        train_set = data_loader.ProcessDataset(train_dic, with_label=True, config=config)
-        valid_set = data_loader.ProcessDataset(valid_dic, with_label=True, config=config)
+        train_set = datasets.get_dataset(train_dic, with_label=True, config=config)
+        valid_set = datasets.get_dataset(valid_dic, with_label=True, config=config)
 
 
     if not config.regression:
@@ -76,9 +76,9 @@ if __name__ == '__main__':
     # sampler = WeightedRandomSampler(samples_weight, sample_num, replacement=True)
 
     train_loader = DataLoader(train_set, batch_size=config.batch_size, prefetch_factor=2,
-                              num_workers=8, drop_last=True, pin_memory=True, shuffle=True)
+                              num_workers=0, drop_last=True, pin_memory=False, shuffle=True)
     valid_loader = DataLoader(valid_set, batch_size=config.batch_size, prefetch_factor=2,
-                              num_workers=8, drop_last=True, pin_memory=True)
+                              num_workers=0, drop_last=True, pin_memory=False)
 
 
     model = getattr(model_card, config.backbone)()
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
     if config.name_dataset == 'fi2010':
         test_dic = data_set.get_FI_data('test')
-        test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
+        test_set = datasets.get_dataset(test_dic, with_label=True, config=config)
         test_loader = DataLoader(test_set, batch_size=config.batch_size, prefetch_factor=2,
                                  num_workers=8, drop_last=True, pin_memory=True)
         val_loss, f1, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
@@ -128,14 +128,14 @@ if __name__ == '__main__':
         for i in range(0, 4):
             split = [0, 6+i, 7+i]
             test_dic = data_set.get_crypto_data('test', split)
-            test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
+            test_set = datasets.get_dataset(test_dic, with_label=True, config=config)
             test_loader = DataLoader(test_set, batch_size=config.batch_size, prefetch_factor=2,
                                      num_workers=8, drop_last=True, pin_memory=True)
 
             val_loss, f1, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)
             print(f1)
         test_dic = data_set.get_crypto_data('test')
-        test_set = data_loader.ProcessDataset(test_dic, with_label=True, config=config)
+        test_set = datasets.get_dataset(test_dic, with_label=True, config=config)
         test_loader = DataLoader(test_set, batch_size=config.batch_size, prefetch_factor=2,
                                  num_workers=8, drop_last=True, pin_memory=True)
         val_loss, f1, _ = trainer.evaluate(model, test_loader, device, loss_fn, config)

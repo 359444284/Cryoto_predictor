@@ -23,7 +23,7 @@ def train_epoch(
 ):
 
     # Tracking best validation accuracy
-    best_score = float('-inf')
+    best_score = float('-inf') if config.regression else float('-inf')
     stop_time = 0
 
     # Start training loop
@@ -98,12 +98,12 @@ def train_epoch(
             avg_val_loss, criteria_score, _ = evaluate(model, val_dataloader, device, loss_fn, config)
             # Track the best accuracy
             score = max(criteria_score) + np.mean(np.clip(criteria_score, -0.2, 1)) if config.regression else criteria_score
-            if score >= best_score:
+            if (config.regression and score >= best_score) or (not config.regression and score >= best_score):
                 best_score = score
 
                 if config.regression:
                     fig = plt.figure()
-                    plt.plot([i for i in range(1, config.forecast_horizon + 1, 1)],
+                    plt.plot([i for i in range(1, config.forecast_horizon + 1, config.forecast_stride)],
                              np.clip(criteria_score, -50, 1), 'o-', color='g')
                     fig.suptitle(str(epoch_i) + ": " +str(max(criteria_score)))
                     plt.show()
@@ -121,7 +121,7 @@ def train_epoch(
             train_val_loss.append([avg_train_loss, avg_val_loss])
 
         print("\n")
-        print(best_score)
+        print(f"Best score: {best_score:.5f}%.")
     tools.print_loss_graph(train_val_loss)
 
 
@@ -139,7 +139,6 @@ def evaluate(model, val_dataloader, device, loss_fn, config):
     lable_all = []
     source_all = []
     prob_all = []
-    att_all = []
     # For each batch in our validation set...
     with torch.no_grad():
         for batch in tqdm(val_dataloader):
@@ -171,7 +170,7 @@ def evaluate(model, val_dataloader, device, loss_fn, config):
             val_loss.append(loss.item())
 
             # Calculate the r2
-            if config.name_dataset =='crypto' and config.regression:
+            if config.regression:
                 pred = outputs.detach().cpu().numpy()
                 target = targets.detach().cpu().numpy()
             else:
@@ -349,7 +348,9 @@ def evaluate(model, val_dataloader, device, loss_fn, config):
         return np.mean(val_loss), f1_score(lable_all, pred_all, average='macro'), backtest_data
     else:
         r2 = r2_score(lable_all, pred_all, multioutput='raw_values')
-        print(r2)
+        pred_direction = np.array(pred_all) >= 0
+        target_direction = np.array(lable_all) >= 0
+        print(classification_report(target_direction, pred_direction, zero_division=0, digits=5))
         print('Task1', np.argmax(r2), max(r2), np.mean(np.clip(r2,-50, 1)))
         return np.mean(val_loss), r2, None
 

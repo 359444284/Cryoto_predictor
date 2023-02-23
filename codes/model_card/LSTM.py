@@ -23,9 +23,6 @@ class LSTM(BasicModule):
         )
 
     def forward(self, x):
-        # h0 = torch.zeros(self.num_layer, x.size(0), self.hidden_size).to(self.device)
-        # c0 = torch.zeros(self.num_layer, x.size(0), self.hidden_size).to(self.device)
-
         x, _ = self.lstm(x, None)
         x = self.dropout(x)
         x = x[:, -1, :]

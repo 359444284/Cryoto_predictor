@@ -12,11 +12,11 @@ class Config:
     train_ratio = 0.8
     # default save path: ./checkpoints
     # choose data set from: fi2010, BTC_50, BTC_14, ETH_14, BTC_10
-    name_dataset = "fi2010"
+    name_dataset = "BTC_10"
 
     # load data by days
     # [train begin,    train end,    test end]
-    split_data = [0, 6, 10]
+    split_data = [0, 8, 10]
     # split_data = [4, 14, 14]
     # split_data = [36, 46, 46]
     # split_data = [0, 14, 14]
@@ -26,7 +26,7 @@ class Config:
     regression = False
     # only for model accept time feature
     use_time_feature = False
-
+    freq = 'S'
     # input feature_type: 'all', a list of feature in feature_dic or selected features
     # feature_type = 'all'
 
@@ -34,7 +34,7 @@ class Config:
     # feature subsets: S_LOB, LOB, OFI, OFS, BAI, HR, MPV, AD, TCI, TVI, MPVO, PPRESS, WVPS, PD.
     feature_list = ['LOB']
 
-    feature_type = 'selected'
+    feature_type = 'subset'
     # subset selected by different model:
     # 1.  XGBoost size 25
     # 2.  WFS size 25
@@ -112,22 +112,22 @@ class Config:
 ############################################################################################
 
     # Choose model from LSTM DeepLOB TransformerEn
-    # backbone = 'LSTM'
+    backbone = 'LSTM'
     # backbone = 'TransformerEn'
-    backbone = 'DeepLOB'
+    # backbone = 'DeepLOB'
 
     # whether use selection model
     # Choose between WFS DFR
     select_fun = False
     # select_fun = 'WFS'
 
-    batch_size = 512
+    batch_size = 256
     if name_dataset == 'fi2010':
         lr = 0.01
         # the minimum learning rate will be reach.
         min_lr = lr / 100
     else:
-        lr = 0.0005
+        lr = 0.001
         # the minimum learning rate will be reach.
         min_lr = lr / 20
 
@@ -135,7 +135,7 @@ class Config:
     # loss_fun = 'CE'
     loss_fun = 'DSC'
     # Alpha for DSC
-    DSC_alpha = 0.5
+    DSC_alpha = 0.1
 
     # backtesting setting
     trade_fee = 0.02  # unit %
@@ -154,15 +154,15 @@ class Config:
     label_len = 20
     if regression:
         lockback_window = 100
-        forecast_horizon = 20
+        forecast_horizon = 5
+        forecast_stride = 5
     else:
         lockback_window = 100
         forecast_horizon = 3
-
         # choose label and horizontal
         # Label Equation 1: 160: 20 161: 50 162: 70 163: 100
         # Label Equation 2: 164: 20 165: 50 166: 70 167: 100
-        feature_index.extend([161])
+        feature_index.extend([160])
 
     if LC_window is None:
         LC_window = lockback_window
@@ -209,8 +209,8 @@ class Config:
         plot_forecast = True
         backtesting = True
 
-    preprocess = True
-    if name_dataset == 'fi2010':
+    preprocess = False
+    if not regression:
         preprocess = True
 
 ############################################################################################
