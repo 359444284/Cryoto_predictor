@@ -6,7 +6,7 @@ import torch.nn as nn
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 from sklearn.metrics import r2_score, classification_report, f1_score, accuracy_score
-import tools
+from utils.simple_backtest import *
 import seaborn as sns
 
 def train_epoch(
@@ -115,14 +115,14 @@ def train_epoch(
                 print('reach early stop', stop_time)
                 if stop_time > 4:
                     print(f"Training complete! Best score: {best_score:.5f}%.")
-                    tools.print_loss_graph(train_val_loss)
+                    print_loss_graph(train_val_loss)
                     return
             print([epoch_i, avg_train_loss, avg_val_loss, np.round(best_score, 5)])
             train_val_loss.append([avg_train_loss, avg_val_loss])
 
         print("\n")
         print(f"Best score: {best_score:.5f}%.")
-    tools.print_loss_graph(train_val_loss)
+    print_loss_graph(train_val_loss)
 
 
 def evaluate(model, val_dataloader, device, loss_fn, config):
@@ -286,8 +286,8 @@ def evaluate(model, val_dataloader, device, loss_fn, config):
             trade_delay = config.trade_delay
             trade_fee = config.trade_fee
 
-            DL_machine = tools.tradebot(volume=0.1, fee=trade_fee, short=short)
-            Fallow_machine = tools.tradebot(volume=0.1, fee=trade_fee, short=short)
+            DL_machine = tradebot(volume=0.1, fee=trade_fee, short=short)
+            Fallow_machine = tradebot(volume=0.1, fee=trade_fee, short=short)
             basicline_signal = 0.0003
             curr_price = mid_price[0]
             for i in range(len(forecast_values)-trade_delay):

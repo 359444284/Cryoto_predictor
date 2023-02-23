@@ -1,4 +1,4 @@
-from collections import deque, Counter
+from collections import deque
 import numpy as np
 from matplotlib import pyplot as plt
 

@@ -6,7 +6,7 @@ import numpy as np
 from joblib import Parallel, delayed
 
 
-from ..utils.timefeatures import time_features
+from utils.timefeatures import time_features
 from sklearn.preprocessing import StandardScaler
 
 def scale_function(data, mean, std):

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import datetime
 from collections import deque
-import tools
+from ..utils.tools_preprocessing import *
 
 # books_dir = 'G:\\我的云端硬盘\\crypto_predict\\books\\'
 # trades_dir = 'G:\\我的云端硬盘\\crypto_predict\\trades\\'
