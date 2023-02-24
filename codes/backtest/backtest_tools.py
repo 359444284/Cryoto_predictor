@@ -3,17 +3,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def print_loss_graph(train_val_loss):
-    train_val_loss = np.array(train_val_loss)
-    fig = plt.figure()
-    plt.plot([i for i in range(1, len(train_val_loss) + 1)],
-             np.log10(train_val_loss[:, 0]), label='train')
-    plt.plot([i for i in range(1, len(train_val_loss) + 1)],
-             np.log10(train_val_loss[:, 1]), label='val')
-    fig.suptitle('loss')
-    plt.legend()
-    plt.show()
 
+
+# tradebot for market order
 class tradebot:
     def __init__(self, volume=0.1, fee=0.02, short=True):
         self.volume = volume
@@ -82,13 +74,8 @@ class tradebot:
 
         return (prue_value[j] - prue_value[i]) / (prue_value[j])
 
-    # def get_sharpe(self):
-    #     prue_value = (np.array(self.history) + 1)
-    #     rets = (prue_value[-1] / prue_value[0])
-    #     exReturn = rets - 0.01 / 250
-    #     return np.sqrt(len(exReturn))*exReturn.mean()/exReturn.std()
 
-
+# TODO: this class should be used by trade machine (need refactor)
 class trade_cache():
     def __init__(self, during=1000):
         self.during = during

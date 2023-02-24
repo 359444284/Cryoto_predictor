@@ -86,3 +86,15 @@ def visual(true, preds=None, name='./pic/test.pdf'):
         plt.plot(preds, label='Prediction', linewidth=2)
     plt.legend()
     plt.savefig(name, bbox_inches='tight')
+
+
+def print_loss_graph(train_val_loss):
+    train_val_loss = np.array(train_val_loss)
+    fig = plt.figure()
+    plt.plot([i for i in range(1, len(train_val_loss) + 1)],
+             np.log10(train_val_loss[:, 0]), label='train')
+    plt.plot([i for i in range(1, len(train_val_loss) + 1)],
+             np.log10(train_val_loss[:, 1]), label='val')
+    fig.suptitle('loss')
+    plt.legend()
+    plt.show()

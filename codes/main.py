@@ -80,8 +80,7 @@ if __name__ == '__main__':
     valid_loader = DataLoader(valid_set, batch_size=config.batch_size, prefetch_factor=2,
                               num_workers=0, drop_last=True, pin_memory=False)
 
-
-    model = getattr(model_card, config.backbone)()
+    model = getattr(model_card, config.backbone, "LSTM")()
 
     print(model.model_name)
     if config.select_fun:
