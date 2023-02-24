@@ -1,5 +1,7 @@
 from abc import abstractmethod, ABC
 import numpy as np
+from matplotlib import pyplot as plt
+
 from .backtest_tools import tradebot
 from .config_backtest import ConfigBacktest
 

@@ -3,7 +3,7 @@ class ConfigBacktest:
     trade_fee = 0.02  # unit percentage(%)
     trade_delay = 1  # unit 100ms
     allow_short = True
-    min_data_size = 1000
+    min_data_size = 100
 
     # -----------------------------
     quantile = 0.75

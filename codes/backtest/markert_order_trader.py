@@ -1,3 +1,5 @@
+import collections
+
 from codes.backtest import signal_generator
 from .AbstractTrader import BasicTrader
 
@@ -16,8 +18,3 @@ class MarketTrader(BasicTrader):
                 self.trade_machine.sell_signal(self.ask[i + self.config.trade_delay], self.bid[i + self.config.trade_delay])
             else:
                 self.trade_machine.add_his()
-
-
-
-
-
