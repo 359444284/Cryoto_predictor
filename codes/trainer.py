@@ -1,13 +1,16 @@
+import collections
 from collections import deque
-
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 from sklearn.metrics import r2_score, classification_report, f1_score, accuracy_score
-from utils.simple_backtest import *
+from backtest.markert_order_trader import MarketTrader
+from utils.tools_training import print_loss_graph
 import seaborn as sns
+
 
 def train_epoch(
         config,
@@ -269,74 +272,81 @@ def evaluate(model, val_dataloader, device, loss_fn, config):
 
         backtest_data = None
         if config.backtesting:
-            forecast_values = np.array(pred_all)
-            forecast_prob = np.array(prob_all)
-            positive_prob = np.array(prob_all)
-            negative_prob = np.array(prob_all)
-            positive_prob = positive_prob[forecast_values == 2]
-            negative_prob = negative_prob[forecast_values == 1]
-            buy_throd = np.quantile(positive_prob, config.signal_threshold)
-            sell_throd = np.quantile(negative_prob, config.signal_threshold)
-            short = True
-
-            mid_price = np.array(source_all)[:, 0]
-            bid = np.array(source_all)[:, 1]
-            ask = np.array(source_all)[:, 2]
-            print(bid[0], ask[0])
-            trade_delay = config.trade_delay
-            trade_fee = config.trade_fee
-
-            DL_machine = tradebot(volume=0.1, fee=trade_fee, short=short)
-            Fallow_machine = tradebot(volume=0.1, fee=trade_fee, short=short)
-            basicline_signal = 0.0003
-            curr_price = mid_price[0]
-            for i in range(len(forecast_values)-trade_delay):
-
-                if forecast_values[i] == 2 and forecast_prob[i] >= buy_throd:
-                    DL_machine.buy_signal(ask[i+trade_delay], bid[i+trade_delay])
-                elif forecast_values[i] == 1 and forecast_prob[i] >= sell_throd:
-                    DL_machine.sell_signal(ask[i+trade_delay], bid[i+trade_delay])
-                else:
-                    DL_machine.add_his()
-
-                if (mid_price[i]/curr_price - 1) > basicline_signal:
-                    Fallow_machine.buy_signal(ask[i+trade_delay], bid[i+trade_delay])
-                elif -(mid_price[i]/curr_price - 1) > basicline_signal:
-                    Fallow_machine.sell_signal(ask[i+trade_delay], bid[i+trade_delay])
-                else:
-                    Fallow_machine.add_his()
-                curr_price = mid_price[i]
-
-            print([np.quantile(positive_prob, i / 10) for i in range(1, 10, 1)])
-            print([np.quantile(negative_prob, i / 10) for i in range(1, 10, 1)])
-            print('buy_throd', buy_throd)
-            print('sell_throd', sell_throd)
-
-            DL_his = DL_machine.get_his()
-            FL_his = Fallow_machine.get_his()
-            backtest_data = [DL_machine.get_trade_time(),
-                             DL_machine.get_winning_rate(),
-                             DL_machine.get_underfee_rate(),
-                             DL_machine.get_max_drawdown(),
-                             DL_his[-1],
-                             (mid_price / mid_price[0] - 1)[len(DL_his) - 1],
-                             buy_throd,
-                             sell_throd]
-            print('trade time:', backtest_data[0])
-            print('winning rate:', backtest_data[1])
-            print('meaningful winning:', backtest_data[2])
-            print('max drawback:', backtest_data[3])
-            print('highest value:', max(DL_his))
-            print('profit:', backtest_data[4])
-            # print('sharp: ', DL_machine.get_sharpe())
-            print('buy_and_hold:', backtest_data[5])
-            print('baseLine profit', FL_his[-1])
-            print('baseLine max drawback', Fallow_machine.get_max_drawdown())
-            fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-            ax.plot(mid_price/mid_price[0] -1, label='price', alpha=1, color='black')
-            ax.plot((np.array(DL_his)), label='profit', alpha=0.7, color='red')
-            ax.set_xlim(left=0, right=len(DL_his))
-            plt.show()
+            model_out = {
+                "pred": pred_all,
+                "prob": prob_all
+            }
+            model_backtest = MarketTrader(source_all, model_out)
+            model_backtest.run_strategy()
+            model_backtest.print_result()
+            # forecast_values = np.array(pred_all)
+            # forecast_prob = np.array(prob_all)
+            # positive_prob = np.array(prob_all)
+            # negative_prob = np.array(prob_all)
+            # positive_prob = positive_prob[forecast_values == 2]
+            # negative_prob = negative_prob[forecast_values == 1]
+            # buy_throd = np.quantile(positive_prob, config.signal_threshold)
+            # sell_throd = np.quantile(negative_prob, config.signal_threshold)
+            # short = True
+            #
+            # mid_price = np.array(source_all)[:, 0]
+            # bid = np.array(source_all)[:, 1]
+            # ask = np.array(source_all)[:, 2]
+            # print(bid[0], ask[0])
+            # trade_delay = config.trade_delay
+            # trade_fee = config.trade_fee
+            #
+            # DL_machine = tradebot(volume=0.1, fee=trade_fee, short=short)
+            # Fallow_machine = tradebot(volume=0.1, fee=trade_fee, short=short)
+            # basicline_signal = 0.0003
+            # curr_price = mid_price[0]
+            # for i in range(len(forecast_values)-trade_delay):
+            #
+            #     if forecast_values[i] == 2 and forecast_prob[i] >= buy_throd:
+            #         DL_machine.buy_signal(ask[i+trade_delay], bid[i+trade_delay])
+            #     elif forecast_values[i] == 1 and forecast_prob[i] >= sell_throd:
+            #         DL_machine.sell_signal(ask[i+trade_delay], bid[i+trade_delay])
+            #     else:
+            #         DL_machine.add_his()
+            #
+            #     if (mid_price[i]/curr_price - 1) > basicline_signal:
+            #         Fallow_machine.buy_signal(ask[i+trade_delay], bid[i+trade_delay])
+            #     elif -(mid_price[i]/curr_price - 1) > basicline_signal:
+            #         Fallow_machine.sell_signal(ask[i+trade_delay], bid[i+trade_delay])
+            #     else:
+            #         Fallow_machine.add_his()
+            #     curr_price = mid_price[i]
+            #
+            # print([np.quantile(positive_prob, i / 10) for i in range(1, 10, 1)])
+            # print([np.quantile(negative_prob, i / 10) for i in range(1, 10, 1)])
+            # print('buy_throd', buy_throd)
+            # print('sell_throd', sell_throd)
+            #
+            # DL_his = DL_machine.get_his()
+            # FL_his = Fallow_machine.get_his()
+            # backtest_data = [DL_machine.get_trade_time(),
+            #                  DL_machine.get_winning_rate(),
+            #                  DL_machine.get_underfee_rate(),
+            #                  DL_machine.get_max_drawdown(),
+            #                  DL_his[-1],
+            #                  (mid_price / mid_price[0] - 1)[len(DL_his) - 1],
+            #                  buy_throd,
+            #                  sell_throd]
+            # print('trade time:', backtest_data[0])
+            # print('winning rate:', backtest_data[1])
+            # print('meaningful winning:', backtest_data[2])
+            # print('max drawback:', backtest_data[3])
+            # print('highest value:', max(DL_his))
+            # print('profit:', backtest_data[4])
+            # # print('sharp: ', DL_machine.get_sharpe())
+            # print('buy_and_hold:', backtest_data[5])
+            # print('baseLine profit', FL_his[-1])
+            # print('baseLine max drawback', Fallow_machine.get_max_drawdown())
+            # fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+            # ax.plot(mid_price/mid_price[0] -1, label='price', alpha=1, color='black')
+            # ax.plot((np.array(DL_his)), label='profit', alpha=0.7, color='red')
+            # ax.set_xlim(left=0, right=len(DL_his))
+            # plt.show()
 
             # b, w, d = pred_all.shape
             # pred_all = pred_all.reshape(b, w)
