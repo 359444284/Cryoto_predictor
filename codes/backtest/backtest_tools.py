@@ -1,3 +1,4 @@
+import collections
 from collections import deque
 import numpy as np
 from matplotlib import pyplot as plt
@@ -17,6 +18,8 @@ class tradebot:
         self.loss = 0
         self.under_fee = 0
         self.short = short
+        self.prev_action = 0
+        self.actions = collections.defaultdict(lambda : [0, 0])
 
     def deal(self, price, side):
         earn = -(price / self.open_price - 1) * self.volume * side
@@ -29,11 +32,14 @@ class tradebot:
         else:
             self.loss += 1
         self.side = 0
+        self.actions[(len(self.history) - 1 - self.prev_action)][0] += 1
+        self.actions[(len(self.history) - 1 - self.prev_action)][1] += earn - fee
 
     def buy_signal(self, ask, bid):
         if self.side == 0:
             self.open_price = ask
             self.side = 1
+            self.prev_action = len(self.history)
         elif self.side == -1 and self.short:
             self.deal(bid, 1)
             return
@@ -43,6 +49,7 @@ class tradebot:
         if self.side == 0 and self.short:
             self.open_price = bid
             self.side = -1
+            self.prev_action = len(self.history)
         elif self.side == 1:
             self.deal(ask, -1)
             return
@@ -63,6 +70,17 @@ class tradebot:
     def get_underfee_rate(self):
         return 1 - (self.under_fee/(self.win + 1e-10))
 
+    def get_action_time_info(self):
+        action_list = []
+        for key , value in self.actions.items():
+            action_list.append([key, value[0], value[1]])
+        action_list = np.array(action_list)
+        total_action = sum(action_list[:, 1])
+        print("average hold: ", sum(action_list[:, 0] * action_list[:, 1])/total_action)
+        print("min hold: ", np.min(action_list[:, 0]))
+        print("max hold: ", np.max(action_list[:, 0]))
+        print("hold times: ", total_action)
+        # print([[interval, times, earn] for interval, times, earn in sorted(action_list, key=lambda x:x[2], reverse=True)])
     def get_max_drawdown(self):
         prue_value = (np.array(self.history) + 1)
         prefix_max = np.maximum.accumulate(prue_value)

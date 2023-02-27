@@ -36,7 +36,7 @@ class BasicTrader(ABC):
         print('max drawback:', backtest_data[3])
         print('highest value:', max(trade_history))
         print('profit:', backtest_data[4])
-        # print('sharp: ', DL_machine.get_sharpe())
+        self.trade_machine.get_action_time_info()
         fig, ax = plt.subplots(1, 1, figsize=(12, 8))
         ax.plot(self.mid_price / self.mid_price[0] - 1, label='price', alpha=1, color='black')
         ax.plot((np.array(trade_history)), label='profit', alpha=0.7, color='red')

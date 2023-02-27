@@ -6,6 +6,7 @@ import numpy as np
 
 def time_to_timespan(timestamp):
     return int(datetime.datetime.timestamp(datetime.datetime.strptime(timestamp[:-3], "%Y-%m-%dD%H:%M:%S.%f")) * 1000)
+    # return datetime.datetime.timestamp(datetime.datetime.strptime(timestamp[:-3], "%Y-%m-%dD%H:%M:%S.%f"))
 
 
 def calculator_order_flows(curr_p, pre_p, curr_v, pre_v, is_bid=True):

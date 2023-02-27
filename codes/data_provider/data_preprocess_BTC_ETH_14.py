@@ -62,8 +62,8 @@ for dy in range(begin_day, len(book_files)):
     print(books[:1])
     print(trades[:1])
 
-    books['time'] = books['time'].apply(tools.time_to_timespan)
-    trades['time'] = trades['time'].apply(tools.time_to_timespan)
+    books['time'] = books['time'].apply(time_to_timespan)
+    trades['time'] = trades['time'].apply(time_to_timespan)
 
     gap = books['time'].to_numpy()
     gap = [gap[i + 1] - gap[i] for i in range(len(gap) - 1)]
@@ -118,9 +118,9 @@ for dy in range(begin_day, len(book_files)):
         tmp_bof = []
         tmp_aof = []
         for i in range(1, len(bid_price)):
-            tmp_bof.append(tools.calculator_order_flows(bid_price[i], bid_price[i - 1], bid_vol[i], bid_vol[i - 1]))
+            tmp_bof.append(calculator_order_flows(bid_price[i], bid_price[i - 1], bid_vol[i], bid_vol[i - 1]))
             tmp_aof.append(
-                tools.calculator_order_flows(ask_price[i], ask_price[i - 1], ask_vol[i], ask_vol[i - 1], is_bid=False))
+                calculator_order_flows(ask_price[i], ask_price[i - 1], ask_vol[i], ask_vol[i - 1], is_bid=False))
         bof.append(tmp_bof)
         aof.append(tmp_aof)
     # #
@@ -128,7 +128,7 @@ for dy in range(begin_day, len(book_files)):
     # #
     of_features = np.concatenate([np.array(bof).T, np.array(aof).T], axis=1)
 
-    bid_ask_imbs = np.concatenate([[tools.bid_ask_imbalance(books, deep=i, version1=False)] for i in range(1, 11, 1)], axis=0).T
+    bid_ask_imbs = np.concatenate([[bid_ask_imbalance(books, deep=i, version1=False)] for i in range(1, 11, 1)], axis=0).T
 
     w_volume_bid = np.sum(books.iloc[:, 23:33].to_numpy() * books.iloc[:, 3:13].to_numpy() * np.arange(1, 0, -0.1), axis=1)
     w_volume_ask = np.sum(books.iloc[:, 33:43].to_numpy() * books.iloc[:, 13:23].to_numpy() * np.arange(1, 0, -0.1), axis=1)
@@ -151,8 +151,8 @@ for dy in range(begin_day, len(book_files)):
     S_V = books.iloc[:, 23:43].to_numpy()/mean_vol
     S_Lob = np.log(np.concatenate([S_P, S_V], axis=1))
 
-    TC_IMBAL, TV_IMBAL, BEGIN_TC = tools.get_TCI_and_TVI(books, trades, duration=1000*stride)
-    mid_price_volatillity, BEGIN_MP = tools.get_midPrice_volatility(books)
+    TC_IMBAL, TV_IMBAL, BEGIN_TC = get_TCI_and_TVI(books, trades, duration=1000*stride)
+    mid_price_volatillity, BEGIN_MP = get_midPrice_volatility(books)
 
     BEGIN = max(BEGIN_TC, BEGIN_MP, 15)
     if dy > begin_day:

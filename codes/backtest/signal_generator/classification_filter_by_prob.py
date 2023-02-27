@@ -1,3 +1,5 @@
+from collections import deque
+
 import numpy as np
 from .AbstractClassifyStrategy import BaseClassificationStrategy
 
@@ -8,10 +10,21 @@ class C_FBP(BaseClassificationStrategy):
         self.quantile = config.quantile
         self.min_data_size = config.min_data_size
         self.get_trade_threshold()
+        self.buy_probs = deque(maxlen=config.min_data_size)
+        self.sell_probs = deque(maxlen=config.min_data_size)
 
     def get_trade_signal(self, idx):
+        if self.pred[idx] == 2:
+            self.buy_probs.append(self.prob[idx])
+        elif self.pred[idx] == 1:
+            self.sell_probs.append(self.prob[idx])
+
+
         if idx < self.min_data_size:
             return 0
+
+        self.buy_throds = np.quantile(self.buy_probs, self.quantile)
+        self.sell_throds = np.quantile(self.sell_probs, self.quantile)
         if self.pred[idx] == 2 and self.prob[idx] >= self.buy_throds:
             return 2
         elif self.pred[idx] == 1 and self.prob[idx] >= self.sell_throds:
@@ -23,10 +36,10 @@ class C_FBP(BaseClassificationStrategy):
         # use in reality, but too slow in here
         # probs = np.lib.stride_tricks.sliding_window_view(self.prob, self.min_data_size, axis=0)
         # filter = np.lib.stride_tricks.sliding_window_view(self.pred, self.min_data_size, axis=0)
-
+        #
         # positive_filter = filter == 2
         # negative_filter = filter == 1
-
+        #
         # positive_prob = np.where(positive_filter, probs, np.nan)
         # negative_prob = np.where(negative_filter, probs, np.nan)
         #
@@ -41,13 +54,16 @@ class C_FBP(BaseClassificationStrategy):
 
         # ------------
 
-        positive_filter = self.pred == 2
-        negative_filter = self.pred == 1
-        positive_prob = np.where(positive_filter, self.prob, np.nan)
-        negative_prob = np.where(negative_filter, self.prob, np.nan)
+        # positive_filter = self.pred == 2
+        # negative_filter = self.pred == 1
+        # positive_prob = np.where(positive_filter, self.prob, np.nan)
+        # negative_prob = np.where(negative_filter, self.prob, np.nan)
+        #
+        # self.buy_throds = np.nanquantile(positive_prob, self.quantile)
+        # self.sell_throds = np.nanquantile(negative_prob, self.quantile)
 
-        self.buy_throds = np.nanquantile(positive_prob, self.quantile)
-        self.sell_throds = np.nanquantile(negative_prob, self.quantile)
+        # ------------
+        pass
 
 
 
