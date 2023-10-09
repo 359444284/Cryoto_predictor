@@ -2,7 +2,7 @@ binance==0.3
 codes==0.1.5
 cryptofeed==2.2.3
 einops==0.4.1
-joblib==1.1.0
+joblib==1.2.0
 matplotlib==3.5.1
 numpy==1.22.3
 pandas==1.4.2
